@@ -16,6 +16,7 @@
 {% block script %}
   <script>
     var socket = new WebSocket('ws://' + window.location.host + '/users/');
+    console.log("WebSocket url - ", 'ws://' + window.location.host + '/users/');
 
     socket.onopen = function open() {
       console.log('WebSockets connection created.');
@@ -23,18 +24,20 @@
 
     socket.onmessage = function message(event) {
       var data = JSON.parse(event.data);
+      console.log("data - ", data);
       // NOTE: We escape JavaScript to prevent XSS attacks.
       var username = encodeURI(data['username']);
       var user = $('li').filter(function () {
         return $(this).data('username') == username;
       });
 
-      if (data['is_logged_in']) {
+      if (data['is_logged_in'])
         user.html(username + ': Online');
-      }
-      else {
+      else
         user.html(username + ': Offline');
-      }
+
+      if (user.length === 0)
+        $('ul').append("<li data-username='"+ username +"'>"+ username + ": Online");
     };
 
     if (socket.readyState == WebSocket.OPEN) {
